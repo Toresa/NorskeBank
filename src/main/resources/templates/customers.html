@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>List of Customers</title>
+</head>
+<body>
+    <h1>List of Customers</h1>
+    <ul>
+        <li th:each="customer : ${customers}">
+            <span th:text="${customer.customerName}"></span>
+            <span th:text="${customer.getTotalBalance()}"></span>
+        </li>
+    </ul>
+</body>
+</html>
