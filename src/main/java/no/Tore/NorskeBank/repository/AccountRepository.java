@@ -14,4 +14,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     // Use a custom query to reference customer.customerId
     @Query("SELECT a FROM Account a WHERE a.customer.customerId = :customerId")
     List<Account> findByCustomerId(@Param("customerId") Long customerId);
+
+    @Query("SELECT a FROM Account a JOIN FETCH a.transactions WHERE a.accountId = :accountId")
+    Account findAccountWithTransactions(@Param("accountId") Long accountId);
 }
