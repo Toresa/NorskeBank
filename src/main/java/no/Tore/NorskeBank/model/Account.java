@@ -19,12 +19,16 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Transaction> transactions;
 
+    @Transient
+    private boolean dirty = false; // Transient field to track changes
+
     public Long getAccountId() {
         return accountId;
     }
 
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
+        markDirty(); // Mark as dirty when the ID changes
     }
 
     public String getAccountName() {
@@ -33,6 +37,7 @@ public class Account {
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+        markDirty(); // Mark as dirty when the name changes
     }
 
     public double getBalance() {
@@ -41,6 +46,7 @@ public class Account {
 
     public void setBalance(double balance) {
         this.balance = balance;
+        markDirty(); // Mark as dirty when the balance changes
     }
 
     public Customer getCustomer() {
@@ -49,6 +55,7 @@ public class Account {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+        markDirty(); // Mark as dirty when the customer changes
     }
 
     public List<Transaction> getTransactions() {
@@ -57,6 +64,7 @@ public class Account {
 
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
+        markDirty(); // Mark as dirty when the transactions list changes
     }
 
     // Method to add a transaction and update the balance
@@ -71,7 +79,6 @@ public class Account {
 
         // Update the account balance based on the transaction type
         if ("deposit".equalsIgnoreCase(type)) {
-            // Ensure that the deposit amount is positive
             if (amount <= 0) {
                 throw new IllegalArgumentException("Deposit amount must be positive");
             }
@@ -80,10 +87,21 @@ public class Account {
             if (amount > this.balance) {
                 throw new IllegalArgumentException("Insufficient funds for withdrawal");
             }
-            // Ensure that the withdrawal amount does not exceed the balance
             this.balance -= amount;
         } else {
             throw new IllegalArgumentException("Invalid transaction type: " + type);
         }
+
+        markDirty(); // Mark as dirty after adding a transaction
+    }
+
+    // Mark the entity as dirty
+    private void markDirty() {
+        this.dirty = true;
+    }
+
+    // Check if the entity is dirty
+    public boolean isDirty() {
+        return dirty;
     }
 }

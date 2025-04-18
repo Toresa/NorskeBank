@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import no.Tore.NorskeBank.model.Customer;
 import no.Tore.NorskeBank.model.Transaction;
 import no.Tore.NorskeBank.repository.CustomerRepository;
@@ -29,6 +30,9 @@ class NorskeBankApplicationTests {
 
 	@Autowired
 	private AccountRepository accountRepository;
+
+	@Autowired
+	private EntityManager entityManager;
 	
 	@Test
 	public void testCustomerRepository() {
@@ -90,6 +94,13 @@ class NorskeBankApplicationTests {
 		accountRepository.save(account); // Save the account after adding the transaction
 		double afterBalance = account.getBalance();
 		assertTrue(afterBalance == beforeBalance + 123.45, "Balance should be updated correctly after deposit");
+		//let's check if the balance is updated in the Account table by retrieving the account again
+		Account updatedAccount = accountRepository.findById(accountId).orElse(null);
+		entityManager.refresh(updatedAccount); 
+		assertTrue(updatedAccount != null, "Updated account should not be null");
+		assertTrue(updatedAccount.getBalance() == afterBalance, "Updated account balance should match");
+
+
 	}
 
 }
